@@ -17,7 +17,7 @@ def chatbot(model, tokenizer, device):
         chat(model, tokenizer, device, prompt)
 
     print("Goodbye!")
-    
+# f
 def chat(model, tokenizer, device, start_context):
     """More advanced text generation"""
     n = len(start_context)
