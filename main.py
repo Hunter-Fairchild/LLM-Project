@@ -8,6 +8,9 @@ import Architecture.Training as Training
 from Architecture.Loss_Functions import plot_losses
 from Chatbot import chatbot
 
+print("hi")
+
+
 # model parameters
 GPT_CONFIG_124M = {
 "vocab_size": 50257,
