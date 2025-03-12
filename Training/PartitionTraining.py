@@ -19,7 +19,6 @@ class PartitionTraining:
         self.config = config
         self.model = Model.GPTModel(self.config)
         self.model.eval()
-        print(str(self.model))
 
         # build tokenizer
         self.tokenizer = tiktoken.get_encoding("gpt2")
