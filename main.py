@@ -5,21 +5,19 @@ import platform
 import Architecture.GPTModel as Model
 import Architecture.Embedding as Embedding
 import Architecture.Training as Training
+import Training.Dataloaders as Dataloaders
 from Architecture.Loss_Functions import plot_losses
 from Chatbot import chatbot
 
-print("hi 2")
-
-
 # model parameters
 GPT_CONFIG_124M = {
-"vocab_size": 50257,
-"context_length": 256,
-"emb_dim": 768,
-"n_heads": 12,
-"n_layers": 12,
-"drop_rate": 0.1,
-"qkv_bias": False
+    "vocab_size": 50257,
+    "context_length": 256,
+    "emb_dim": 768,
+    "n_heads": 12,
+    "n_layers": 12,
+    "drop_rate": 0.1,
+    "qkv_bias": False
 }
 
 
@@ -33,46 +31,47 @@ tokenizer = tiktoken.get_encoding("gpt2")
 
 # load directory of data
 os_version = platform.system()
-directory = 'Datasets/Small Dataset'
-
-text_data = ""
-for filename in os.listdir(directory):               # iterate over files in that directory
-    file_path = os.path.join(directory, filename)    # create filepath
-
-    if os.path.isfile(file_path):                    # checking if it is a file
-        print(file_path)
-
-        with open(file_path, "r", encoding="utf-8") as file:    # open file
-            text_data += file.read() + "<|endoftext|>"          # read the file
-
-# create training/validation set
-train_ratio = 0.90
-split_idx = int(train_ratio * len(text_data))
-train_data = text_data[:split_idx]
-val_data = text_data[split_idx:]
 
 # create dataloaders for each set
 torch.manual_seed(123)
-train_loader = Embedding.create_dataloader_v1(
-    train_data,
-    batch_size=2,
-    max_length=GPT_CONFIG_124M["context_length"],
-    stride=GPT_CONFIG_124M["context_length"],
-    drop_last=True,
-    shuffle=True,
-    num_workers=0
-)
+# directory = 'Datasets/Small Dataset'
 
-val_loader = Embedding.create_dataloader_v1(
-    val_data,
-    batch_size=2,
-    max_length=GPT_CONFIG_124M["context_length"],
-    stride=GPT_CONFIG_124M["context_length"],
-    drop_last=False,
-    shuffle=False,
-    num_workers=0
-)
+# text_data = ""
+# for filename in os.listdir(directory):               # iterate over files in that directory
+#     file_path = os.path.join(directory, filename)    # create filepath
 
+#     if os.path.isfile(file_path):                    # checking if it is a file
+#         print(file_path)
+
+#         with open(file_path, "r", encoding="utf-8") as file:    # open file
+#             text_data += file.read() + "<|endoftext|>"          # read the file
+
+# # create training/validation set
+# train_ratio = 0.90
+# split_idx = int(train_ratio * len(text_data))
+# train_data = text_data[:split_idx]
+# val_data = text_data[split_idx:]
+
+# train_loader = Embedding.create_dataloader_v1(
+#     train_data,
+#     batch_size=2,
+#     max_length=GPT_CONFIG_124M["context_length"],
+#     stride=GPT_CONFIG_124M["context_length"],
+#     drop_last=True,
+#     shuffle=True,
+#     num_workers=0
+# )
+
+# val_loader = Embedding.create_dataloader_v1(
+#     val_data,
+#     batch_size=2,
+#     max_length=GPT_CONFIG_124M["context_length"],
+#     stride=GPT_CONFIG_124M["context_length"],
+#     drop_last=False,
+#     shuffle=False,
+#     num_workers=0
+# )
+train_loader, val_loader = Dataloaders.makeDataLoaders(GPT_CONFIG_124M, 'Datasets/Small Dataset', 0.9)
 
 # # Loading Code
 # device = "cpu"
