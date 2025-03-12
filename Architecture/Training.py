@@ -6,7 +6,7 @@ from Architecture.Generation import generate_and_print
 
 def train_model(model, train_loader, val_loader, optimizer, device, num_epochs, eval_freq, eval_iter, start_context, tokenizer):
     """Optimization routine for training GPT Models"""
-    train_losses, val_losses, track_tokens_seen = [], [], []
+    train_losses, val_losses, track_tokens_seen, finish_times = [], [], [], []
     tokens_seen, global_step = 0, -1
     start = datetime.datetime.now()
     
@@ -27,22 +27,25 @@ def train_model(model, train_loader, val_loader, optimizer, device, num_epochs, 
                 train_loss, val_loss = evaluate_model(                     # compute losses
                     model, train_loader, val_loader, device, eval_iter)
 
+                end = datetime.datetime.now() - start
+                end = end - datetime.timedelta(microseconds=end.microseconds)
+
                 train_losses.append(train_loss)                            # store loss
                 val_losses.append(val_loss)
                 track_tokens_seen.append(tokens_seen)                      # store tokens seen
-                
-                end = datetime.datetime.now() - start
-                end = end - datetime.timedelta(microseconds=end.microseconds)
+                finish_times.append(end)
                 
                 print(f"Ep {epoch+1} (Step {global_step:06d}): "           # debug print
                     f"Train loss {train_loss:.3f}, "
                     f"Val loss {val_loss:.3f}, "
                     f"Time {end}"
                 )
+            if global_step == 10:
+                break
 
         generate_and_print(model, tokenizer, device, start_context)        # output from the model for each epoch
 
-    return train_losses, val_losses, track_tokens_seen
+    return train_losses, val_losses, track_tokens_seen, finish_times
 
 def evaluate_model(model, train_loader, val_loader, device, eval_iter):
     """computes the loss for both the training and validation sets"""

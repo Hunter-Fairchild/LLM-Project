@@ -23,4 +23,4 @@ GPT_CONFIG_124M = {
 
 training = PartitionTraining.PartitionTraining(GPT_CONFIG_124M)
 training.partition_train(1)
-training.save("Testing.pth")
+training.save("Models/Testing.pth")

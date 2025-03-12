@@ -7,8 +7,8 @@ import Architecture.GPTModel as Model
 import Architecture.Embedding as Embedding
 import Architecture.Training as Training
 import Training.Dataloaders as Dataloaders
+import Training.Logging as Logging
 from Architecture.Loss_Functions import plot_losses
-from Chatbot import chatbot
 
 
 class PartitionTraining:
@@ -19,12 +19,14 @@ class PartitionTraining:
         self.config = config
         self.model = Model.GPTModel(self.config)
         self.model.eval()
+        print(str(self.model))
 
         # build tokenizer
         self.tokenizer = tiktoken.get_encoding("gpt2")
 
         # load directory of data
         self.os_version = platform.system()
+        self.logger = Logging.Logging()
 
         self.train_loader, self.val_loader = Dataloaders.make_data_loaders(self.config, 'Datasets/Small Dataset', 0.9)
         
@@ -39,38 +41,41 @@ class PartitionTraining:
             lr=0.0004, weight_decay=0.1
         )
         
-        self.stats = {}
+        self.stats = []
         
     def partition_train(self, num_epochs: int):
-        print(self.model)
         # start training (optimization) method
-        train_losses, val_losses, tokens_seen = Training.train_model(
+        train_losses, val_losses, tokens_seen, finish_times = Training.train_model(
             self.model, self.train_loader, self.val_loader, self.optimizer, self.device,
             num_epochs=num_epochs, eval_freq=5, eval_iter=5,
             start_context="The cat sprinted down", tokenizer=self.tokenizer
         )
-        # produce plots
         
-        self.stats = {
-            "model": self.model,
-            "optimizer": self.optimizer,
-            "num_epochs": num_epochs, 
-            "train_losses": train_losses, 
-            "val_losses": val_losses, 
-            "tokens_seen": tokens_seen
-        }
+        self.stats.append({
+            "model": str(self.model),
+            "optimizer": str(self.optimizer),
+            "num_epochs": str(num_epochs), 
+            "train_losses": str(train_losses), 
+            "val_losses": str(val_losses), 
+            "tokens_seen": str(tokens_seen), 
+            "finish_times": str(finish_times)
+        })
         
-        epochs_tensor = torch.linspace(0, num_epochs, len(train_losses))
-        plot_losses(epochs_tensor, tokens_seen, train_losses, val_losses)
+        # epochs_tensor = torch.linspace(0, num_epochs, len(train_losses))
+        # plot_losses(epochs_tensor, tokens_seen, train_losses, val_losses)
 
     def save(self, file_name: str):
         # save model weights and optimization info
+        print("Saving Model")
         torch.save({
             "model_state_dict": self.model.state_dict(),
             "optimizer_state_dict": self.optimizer.state_dict(),
             },
             file_name
         )
+        print("Submitting Logs")
+        for stats in self.stats:
+            self.logger.write_logs(stats)
         
     def load(self):
         checkpoint = torch.load("model_and_optimizer_small.pth", map_location="cpu")
