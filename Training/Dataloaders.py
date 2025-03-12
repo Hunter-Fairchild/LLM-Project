@@ -1,16 +1,10 @@
-import torch
-import tiktoken
 import os
-import platform
 from typing import Union
 from torch.utils.data import DataLoader
-import Architecture.GPTModel as Model
 import Architecture.Embedding as Embedding
-import Architecture.Training as Training
-from Architecture.Loss_Functions import plot_losses
 
 
-def makeDataLoaders(config: dict[str], directory: str, train_ratio: float) -> tuple[DataLoader]:
+def make_data_loaders(config: dict[Union[int, float]], directory: str, train_ratio: float) -> tuple[DataLoader]:
     text_data = ""
     for filename in os.listdir(directory):
         file_path = os.path.join(directory, filename)
