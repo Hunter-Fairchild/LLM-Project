@@ -39,7 +39,10 @@ class PartitionTraining:
             lr=0.0004, weight_decay=0.1
         )
         
+        self.stats = {}
+        
     def partition_train(self, num_epochs: int):
+        print(self.model)
         # start training (optimization) method
         train_losses, val_losses, tokens_seen = Training.train_model(
             self.model, self.train_loader, self.val_loader, self.optimizer, self.device,
@@ -47,6 +50,16 @@ class PartitionTraining:
             start_context="The cat sprinted down", tokenizer=self.tokenizer
         )
         # produce plots
+        
+        self.stats = {
+            "model": self.model,
+            "optimizer": self.optimizer,
+            "num_epochs": num_epochs, 
+            "train_losses": train_losses, 
+            "val_losses": val_losses, 
+            "tokens_seen": tokens_seen
+        }
+        
         epochs_tensor = torch.linspace(0, num_epochs, len(train_losses))
         plot_losses(epochs_tensor, tokens_seen, train_losses, val_losses)
 

@@ -24,16 +24,3 @@ GPT_CONFIG_124M = {
 training = PartitionTraining.PartitionTraining(GPT_CONFIG_124M)
 training.partition_train(1)
 training.save("Testing.pth")
-
-
-# # Loading Code
-# device = "cpu"
-# checkpoint = torch.load("model_and_optimizer_small.pth", map_location="cpu")
-# model = Model.GPTModel(GPT_CONFIG_124M)
-# model.load_state_dict(checkpoint["model_state_dict"])
-# optimizer = torch.optim.AdamW(model.parameters(), lr=5e-4, weight_decay=0.1)
-# optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
-# model.train()
-
-
-# Basic Chatbot using LLM above
