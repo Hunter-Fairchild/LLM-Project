@@ -1,5 +1,6 @@
 import datetime
 import json
+import os
 
 # import torch
 # import tiktoken
@@ -20,17 +21,21 @@ class Logging:
         self.date = train_time.strftime("%Y-%m-%d")
         self.time = train_time.strftime("%H:%M")
         
-        self.file_name = f"Logs_{self.date}"
+        self.file_name = f"Logs_{self.date}.json"
         
     def write_logs(self, stats):
         self.setup()
+        path = f"Training\TrainingLogs\{self.file_name}"
+        previous_logs = []
+        if self.file_name in os.listdir("Training/TrainingLogs"):
+            with open(path, "r") as file:
+                previous_logs += json.load(file)
         
-        with open(f"Training\TrainingLogs\{self.file_name}.json", "a") as file:
-            json.dump({
+        with open(path, "w") as file:
+            json.dump(previous_logs + [{
                 "time": self.time, 
                 "stats": stats
-            }, file)
-            # file.write(f"{self.time}: {stats} \n")
-        
+            }], file)
+
 # Logging().write_logs("Hello")
         

@@ -14,6 +14,8 @@ def train_model(model, train_loader, val_loader, optimizer, device, num_epochs, 
         model.train()                           # put model in training mode
 
         for input_batch, target_batch in train_loader:                        # loop over the training data       (randomized)
+            if global_step == 11:
+                break
             optimizer.zero_grad()                                             # sets all gradients to zero        (zero'ing previous samples)
             loss = calc_loss_batch(input_batch, target_batch, model, device)  # evaluate (sample of) function
             loss.backward()                                                   # compute (sample of) gradient
@@ -40,8 +42,6 @@ def train_model(model, train_loader, val_loader, optimizer, device, num_epochs, 
                     f"Val loss {val_loss:.3f}, "
                     f"Time {end}"
                 )
-            if global_step == 10:
-                break
 
         generate_and_print(model, tokenizer, device, start_context)        # output from the model for each epoch
 
